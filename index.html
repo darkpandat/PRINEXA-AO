@@ -1,0 +1,414 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRINEXA AI - Advanced Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --neon-cyan: hsl(185 100% 50%);
+            --neon-pink: hsl(320 100% 60%);
+            --neon-purple: hsl(280 100% 65%);
+            --bg-primary: hsl(240 15% 8%);
+            --bg-secondary: hsl(240 20% 12%);
+            --text-primary: hsl(0 0% 95%);
+            --text-secondary: hsl(0 0% 70%);
+            --shadow-glow: 0 0 20px hsla(185 100% 50% / 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .app-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .neural-text {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        .vision-text {
+            color: var(--text-primary);
+        }
+        
+        .ai-badge {
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+        
+        .app-tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .neural-panel {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid hsla(185 100% 50% / 0.2);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .panel-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .panel-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .panel-header i {
+            color: var(--neon-cyan);
+        }
+        
+        .input-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .input-label i {
+            color: var(--neon-cyan);
+        }
+        
+        .prompt-input {
+            width: 100%;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: 1px solid hsla(185 100% 50% / 0.2);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .model-card {
+            background: var(--bg-primary);
+            border: 1px solid hsla(185 100% 50% / 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .model-card.selected {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 15px hsla(280 100% 65% / 0.3);
+        }
+        
+        .model-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .model-name {
+            font-weight: 600;
+        }
+        
+        .model-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .results-panel {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .generated-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .error-panel {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid red;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .model-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="app-logo">
+                <span class="neural-text">PRINEXA</span>
+                <span class="ai-badge">AI</span>
+            </h1>
+            <p class="app-tagline">Advanced Multi-Modal Image Generation</p>
+        </header>
+
+        <div class="neural-panel">
+            <div class="panel-header">
+                <h2><i class="fas fa-brain"></i> Neural Generation Interface</h2>
+            </div>
+            
+            <form id="generation-form">
+                <div class="input-section">
+                    <label class="input-label">
+                        <i class="fas fa-lightbulb"></i>
+                        Creative Prompt
+                    </label>
+                    <textarea name="prompt" class="prompt-input" placeholder="Describe your vision..." required></textarea>
+                </div>
+                
+                <div class="input-section">
+                    <label class="input-label">
+                        <i class="fas fa-microchip"></i>
+                        Neural Engine
+                    </label>
+                    <div class="model-grid" id="model-container">
+                        <!-- Models will be added by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="input-section">
+                    <label class="input-label">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                        Aspect Ratio
+                    </label>
+                    <select name="ratio" class="prompt-input">
+                        <option value="1:1">1:1 (Square)</option>
+                        <option value="9:16">9:16 (Portrait)</option>
+                        <option value="16:9">16:9 (Landscape)</option>
+                        <option value="4:3">4:3 (Standard)</option>
+                        <option value="3:4">3:4 (Portrait)</option>
+                        <option value="2:3">2:3 (Portrait)</option>
+                        <option value="3:2">3:2 (Landscape)</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="generate-btn">
+                    <i class="fas fa-bolt"></i> Generate Neural Vision
+                </button>
+            </form>
+        </div>
+        
+        <div class="error-panel" id="error-panel">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="error-content">
+                <h3>Neural Network Error</h3>
+                <p id="error-message"></p>
+            </div>
+        </div>
+        
+        <div class="results-panel" id="results-panel">
+            <div class="image-panel">
+                <div class="panel-header">
+                    <h3><i class="fas fa-sparkles"></i> Neural Vision Generated</h3>
+                </div>
+                <div class="image-container">
+                    <img src="" alt="Generated Image" class="generated-image" id="generated-image">
+                </div>
+                
+                <div class="details-panel">
+                    <h4><i class="fas fa-microchip"></i> Generation Parameters</h4>
+                    <div class="details-grid" id="details-grid">
+                        <!-- Details will be added by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading-overlay" id="loading-overlay">
+            <h2 class="loading-title">PRINEXA AI</h2>
+            <p class="loading-subtitle">Processing Your Vision...</p>
+            <div class="spinner">
+                <i class="fas fa-circle-notch fa-spin fa-3x"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration (same as PHP)
+        const MODELS = {
+            'flux': { name: 'Flux', desc: 'High-quality artistic generation' },
+            'turbo': { name: 'Turbo', desc: 'Fast generation with quality' },
+            'midjourney': { name: 'Midjourney', desc: 'Artistic and creative style' },
+            'llama': { name: 'Llama', desc: 'Advanced language-guided' },
+            'openai': { name: 'OpenAI', desc: 'Balanced and versatile' },
+            'pollination': { name: 'Pollination', desc: 'Nature and organic themes' },
+            'dreamweaver': { name: 'Dreamweaver', desc: 'Surreal and abstract art' }
+        };
+        
+        // Initialize model selection
+        const modelContainer = document.getElementById('model-container');
+        Object.entries(MODELS).forEach(([id, {name, desc}]) => {
+            const modelCard = document.createElement('label');
+            modelCard.className = 'model-card';
+            modelCard.innerHTML = `
+                <input type="radio" name="model" value="${id}" ${id === 'flux' ? 'checked' : ''}>
+                <div class="model-icon-wrapper">
+                    <div class="model-icon ${id}">${name.substring(0, 2)}</div>
+                </div>
+                <div class="model-info">
+                    <div class="model-name">${name}</div>
+                    <div class="model-desc">${desc}</div>
+                </div>
+            `;
+            modelContainer.appendChild(modelCard);
+        });
+        
+        // Form submission
+        document.getElementById('generation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Show loading
+            document.getElementById('loading-overlay').style.display = 'flex';
+            document.getElementById('error-panel').style.display = 'none';
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                
+                // Display results
+                document.getElementById('generated-image').src = result.imageUrl;
+                
+                // Display details
+                const detailsGrid = document.getElementById('details-grid');
+                detailsGrid.innerHTML = '';
+                
+                Object.entries(result.details).forEach(([key, value]) => {
+                    const detailItem = document.createElement('div');
+                    detailItem.className = 'detail-item';
+                    detailItem.innerHTML = `
+                        <div class="detail-content">
+                            <span class="detail-label">${key}</span>
+                            <span class="detail-value">${value}</span>
+                        </div>
+                    `;
+                    detailsGrid.appendChild(detailItem);
+                });
+                
+                document.getElementById('results-panel').style.display = 'block';
+                
+            } catch (error) {
+                document.getElementById('error-message').textContent = error.message;
+                document.getElementById('error-panel').style.display = 'flex';
+            } finally {
+                document.getElementById('loading-overlay').style.display = 'none';
+            }
+        });
+        
+        // Model card selection
+        document.querySelectorAll('.model-card input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.model-card').forEach(card => {
+                    card.classList.toggle('selected', card.contains(this));
+                });
+            });
+        });
+    </script>
+</body>
+</html>
